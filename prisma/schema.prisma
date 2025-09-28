@@ -29,6 +29,8 @@ model User {
 
   email        String  @unique
   passwordHash String
+
   displayName  String?
   userName     String @unique
+  avatarUrl   String?
 }
