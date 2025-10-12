@@ -27,10 +27,185 @@ model User {
   role          Role     @default(USER)
   emailVerified Boolean  @default(false)
 
-  email        String  @unique
+  email        String @unique
   passwordHash String
 
-  displayName  String?
-  userName     String @unique
+  displayName String?
+  userName    String      @unique
   avatarUrl   String?
+  AnimeList   AnimeList[]
+  BookList    BookList[]
+  MovieList   MovieList[]
+  TVList      TVList[]
+  GameList    GameList[]
+  MusicList   MusicList[]
+}
+
+model Anime {
+  id          String        @id @default(cuid())
+  anilistID   String?       @unique
+  malID       String?       @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  title       String  @db.Text
+  coverUrl    String?
+  description String? @db.LongText
+  releaseDate DateTime?
+  status      String?       // e.g. "Watching", "Completed"
+  rating      Float?
+  aniListRating Float?
+  malRating    Float?
+  studio String?
+  episodes    Int?           // total episodes, optional
+  AnimeList   AnimeList[]
+  seasons     AnimeSeason[]  // new relation
+}
+
+model AnimeSeason {
+  id       String   @id @default(cuid())
+  animeId  String
+  season   Int
+  episodes Int
+  anime    Anime    @relation(fields: [animeId], references: [id])
+}
+
+model Book {
+  id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  title       String @db.Text
+  author      String?
+  coverUrl    String?
+  description String? @db.LongText
+  releaseDate DateTime?
+  status      String? // e.g. "Reading", "Completed"
+  rating      Float?
+  BookList    BookList[]
+}
+
+model Movie {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  title       String @db.Text
+  coverUrl    String?
+  description String? @db.LongText
+  releaseDate DateTime?
+  status      String? // e.g. "Watching", "Completed"
+  rating      Float?
+  runtime     Int? // in minutes
+  MovieList   MovieList[]
+}
+
+model TV {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String @db.Text
+  coverUrl    String?
+  description String? @db.LongText
+  releaseDate DateTime?
+  status      String?
+  rating      Float?
+  seasons     Int?
+  episodes    Int?
+  TVList      TVList[]
+}
+
+model Game {
+  id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  title       String @db.Text
+  coverUrl    String?
+  description String? @db.LongText
+  releaseDate DateTime?
+  status      String? // e.g. "Playing", "Completed"
+  rating      Float?
+  platform    String?
+  GameList    GameList[]
+}
+
+model Music {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String @db.Text
+  artist      String?
+  coverUrl    String?
+  releaseDate DateTime?
+  status      String? // e.g. "Listening", "Completed"
+  rating      Float?
+
+  MusicList MusicList[]
+}
+
+model AnimeList {
+  id       String  @id @default(cuid())
+  userId   String
+  animeId  String
+  progress Int? // episodes watched
+  score    Float?
+  status   String? // Watching, Completed, Dropped
+
+  user  User  @relation(fields: [userId], references: [id])
+  anime Anime @relation(fields: [animeId], references: [id])
+}
+
+model BookList {
+  id       String  @id @default(cuid())
+  userId   String
+  bookId   String
+  progress Int? // chapters read
+  score    Float?
+  status   String? // Reading, Completed, Dropped
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+}
+
+model MovieList {
+  id      String  @id @default(cuid())
+  userId  String
+  movieId String
+  score   Float?
+  status  String? // Watching, Completed
+
+  user  User  @relation(fields: [userId], references: [id])
+  movie Movie @relation(fields: [movieId], references: [id])
+}
+
+model TVList {
+  id       String  @id @default(cuid())
+  userId   String
+  tvId     String
+  progress Int? // episodes watched
+  score    Float?
+  status   String? // Watching, Completed
+
+  user User @relation(fields: [userId], references: [id])
+  tv   TV   @relation(fields: [tvId], references: [id])
+}
+
+model GameList {
+  id       String  @id @default(cuid())
+  userId   String
+  gameId   String
+  progress Int? // hours played or %
+  score    Float?
+  status   String? // Playing, Completed, Dropped
+
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
+}
+
+model MusicList {
+  id      String  @id @default(cuid())
+  userId  String
+  musicId String
+  score   Float?
+  status  String? // Listening, Completed
+
+  user  User  @relation(fields: [userId], references: [id])
+  music Music @relation(fields: [musicId], references: [id])
 }

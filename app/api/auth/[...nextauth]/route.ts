@@ -39,7 +39,7 @@ export const authOptions = {
         // return user object for JWT
         return {
           id: user.id,
-          name: user.displayName || user.userName,
+          name: user.userName,
           email: user.email,
         };
       },

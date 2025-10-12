@@ -3,17 +3,7 @@ import "./globals.css"
 import Navbar from "@/components/navbar"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
-
-
-const pages = [
-  { label: "Home", href: "/home" },
-  { label: "Anime List", href: "/anime" },
-  { label: "Manga List", href: "/manga" },
-  { label: "Movies List", href: "/movies" },
-  { label: "TV List", href: "/tv" },
-  { label: "Game List", href: "/games" },
-  { label: "Music List", href: "/music" },
-]
+import Link from "next/link"
 
 
 export const metadata: Metadata = {
@@ -26,31 +16,47 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-
   const session = await auth()
+  
 
-  if (!session) {
-    return (
-      <html lang="en">
-        <body className="bg-[#0f172a] text-white">
-          <main className="p-4">{children}</main>
-        </body>
-      </html>
-    )
-  }
+  const pages = [
+  { label: "Home", href: "/home" },
+  { label: "Anime List", href: `/user/${session.user.name}/animelist` },
+  { label: "Book List", href: `/user/${session.user.name}/booklist` },
+  { label: "Movies List", href: `/user/${session.user.name}/movielist` },
+  { label: "TV List", href: `/user/${session.user.name}/tvlist` },
+  { label: "Game List", href: `/user/${session.user.name}/gamelist` },
+  { label: "Music List", href: `/user/${session.user.name}/musiclist` },
+  { label: "Add to Site", href: "/add"}
+]
+
+  const baseLayout = (content: React.ReactNode) => (
+    <html lang="en">
+      <body className="bg-[#0f172a] text-white flex flex-col min-h-screen">
+        {content}
+      </body>
+    </html>
+  )
+
+  if (!session)
+    return baseLayout(<main className="flex-1 p-4">{children}</main>)
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
   })
 
-
-
-  return (
-    <html lang="en">
-      <body className="bg-[#0f172a] text-white">
-        <Navbar pages={pages} user={{ id: user?.id, userName: user?.userName, profilePic: user?.avatarUrl }} notifications={14} />
-        <main className="p-4">{children}</main>
-      </body>
-    </html>
+  return baseLayout(
+    <>
+      <Navbar
+        pages={pages}
+        user={{
+          id: user?.id,
+          userName: user?.userName,
+          profilePic: user?.avatarUrl,
+        }}
+        notifications={14}
+      />
+      <main className="flex-1 p-4">{children}</main>
+    </>
   )
 }

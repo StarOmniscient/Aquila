@@ -98,11 +98,11 @@ export default function Navbar({ pages, user, notifications = 0 }: NavbarProps) 
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48" align="end">
                   <DropdownMenuLabel>
-                    {user.displayName ?? user.userName}
+                    <Link href="/account">{user.displayName ?? user.userName} </Link>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile</Link>
+                    <Link href={`/user/${user.userName}`}>Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>
