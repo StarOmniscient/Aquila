@@ -12,6 +12,7 @@
     "docker-run": "sudo docker run -d -p 10410:3000 --name aquila aquila:latest"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.16.2",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dropdown-menu": "^2.1.16",

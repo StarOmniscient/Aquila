@@ -4,6 +4,7 @@ import Navbar from "@/components/navbar"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import Link from "next/link"
+import { ThemeProvider } from "@/contexts/ThemeContext"
 
 
 export const metadata: Metadata = {
@@ -32,8 +33,10 @@ export default async function RootLayout({
 
   const baseLayout = (content: React.ReactNode) => (
     <html lang="en">
-      <body className="bg-[#0f172a] text-white flex flex-col min-h-screen">
+      <body className="bg-background text-primary flex flex-col min-h-screen">
+        <ThemeProvider>
         {content}
+        </ThemeProvider>
       </body>
     </html>
   )

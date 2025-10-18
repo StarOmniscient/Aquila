@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -19,20 +13,30 @@ enum Role {
   ADMIN
 }
 
-model User {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  isActive      Boolean  @default(true)
-  role          Role     @default(USER)
-  emailVerified Boolean  @default(false)
+// Optional: uncomment if you want type-safe statuses
+// enum MediaStatus {
+//   PLANNING
+//   WATCHING
+//   COMPLETED
+//   DROPPED
+//   PAUSED
+// }
 
-  email        String @unique
+model User {
+  id            String     @id @default(cuid())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  isActive      Boolean    @default(true)
+  role          Role       @default(USER)
+  emailVerified Boolean    @default(false)
+
+  email        String   @unique
   passwordHash String
 
   displayName String?
-  userName    String      @unique
+  userName    String   @unique
   avatarUrl   String?
+
   AnimeList   AnimeList[]
   BookList    BookList[]
   MovieList   MovieList[]
@@ -42,126 +46,147 @@ model User {
 }
 
 model Anime {
-  id          String        @id @default(cuid())
-  anilistID   String?       @unique
-  malID       String?       @unique
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  title       String  @db.Text
-  coverUrl    String?
-  description String? @db.LongText
-  releaseDate DateTime?
-  status      String?       // e.g. "Watching", "Completed"
-  rating      Float?
+  id            String        @id @default(cuid())
+  anilistID     String?       @unique
+  malID         String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  title         String        @db.Text
+  coverUrl      String?
+  description   String?       @db.Text
+  releaseDate   DateTime?
+  status        String?       // e.g., "Airing", "Finished"
+  rating        Float?
   aniListRating Float?
-  malRating    Float?
-  studio String?
-  episodes    Int?           // total episodes, optional
-  AnimeList   AnimeList[]
-  seasons     AnimeSeason[]  // new relation
+  malRating     Float?
+  studio        String?
+  episodes      Int?
+
+  AnimeList     AnimeList[]
+  seasons       AnimeSeason[]
 }
 
 model AnimeSeason {
-  id       String   @id @default(cuid())
-  animeId  String
-  season   Int
+  id      String  @id @default(cuid())
+  animeId String
+  season  Int
   episodes Int
-  anime    Anime    @relation(fields: [animeId], references: [id])
+
+  anime   Anime   @relation(fields: [animeId], references: [id])
+
+  @@index([animeId])
 }
 
 model Book {
-  id          String     @id @default(cuid())
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  title       String @db.Text
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.Text
   author      String?
   coverUrl    String?
-  description String? @db.LongText
+  description String?  @db.Text
   releaseDate DateTime?
-  status      String? // e.g. "Reading", "Completed"
+  status      String?  // e.g., "Reading"
   rating      Float?
+
   BookList    BookList[]
 }
 
 model Movie {
-  id          String      @id @default(cuid())
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  title       String @db.Text
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.Text
   coverUrl    String?
-  description String? @db.LongText
+  description String?  @db.Text
   releaseDate DateTime?
-  status      String? // e.g. "Watching", "Completed"
+  status      String?
   rating      Float?
-  runtime     Int? // in minutes
+  runtime     Int?     // minutes
+
   MovieList   MovieList[]
 }
 
 model TV {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  title       String @db.Text
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.Text
   coverUrl    String?
-  description String? @db.LongText
+  description String?  @db.Text
   releaseDate DateTime?
   status      String?
   rating      Float?
   seasons     Int?
   episodes    Int?
+
   TVList      TVList[]
 }
 
 model Game {
-  id          String     @id @default(cuid())
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  title       String @db.Text
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.Text
   coverUrl    String?
-  description String? @db.LongText
+  description String?  @db.Text
   releaseDate DateTime?
-  status      String? // e.g. "Playing", "Completed"
+  status      String?
   rating      Float?
   platform    String?
+
   GameList    GameList[]
 }
 
 model Music {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  title       String @db.Text
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.Text
   artist      String?
   coverUrl    String?
   releaseDate DateTime?
-  status      String? // e.g. "Listening", "Completed"
+  status      String?
   rating      Float?
 
-  MusicList MusicList[]
+  MusicList   MusicList[]
 }
+
+// --- List Models with indexes and unique constraints ---
 
 model AnimeList {
   id       String  @id @default(cuid())
   userId   String
   animeId  String
-  progress Int? // episodes watched
+  progress Int?
   score    Float?
-  status   String? // Watching, Completed, Dropped
+  status   String? // or MediaStatus? if using enum
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user  User  @relation(fields: [userId], references: [id])
   anime Anime @relation(fields: [animeId], references: [id])
+
+  @@unique([userId, animeId])
+  @@index([userId])
+  @@index([animeId])
 }
 
 model BookList {
   id       String  @id @default(cuid())
   userId   String
   bookId   String
-  progress Int? // chapters read
+  progress Int?
   score    Float?
-  status   String? // Reading, Completed, Dropped
+  status   String?
 
   user User @relation(fields: [userId], references: [id])
   book Book @relation(fields: [bookId], references: [id])
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
 }
 
 model MovieList {
@@ -169,34 +194,46 @@ model MovieList {
   userId  String
   movieId String
   score   Float?
-  status  String? // Watching, Completed
+  status  String?
 
   user  User  @relation(fields: [userId], references: [id])
   movie Movie @relation(fields: [movieId], references: [id])
+
+  @@unique([userId, movieId])
+  @@index([userId])
+  @@index([movieId])
 }
 
 model TVList {
   id       String  @id @default(cuid())
   userId   String
   tvId     String
-  progress Int? // episodes watched
+  progress Int?
   score    Float?
-  status   String? // Watching, Completed
+  status   String?
 
   user User @relation(fields: [userId], references: [id])
-  tv   TV   @relation(fields: [tvId], references: [id])
+  tv   TV  @relation(fields: [tvId], references: [id])
+
+  @@unique([userId, tvId])
+  @@index([userId])
+  @@index([tvId])
 }
 
 model GameList {
   id       String  @id @default(cuid())
   userId   String
   gameId   String
-  progress Int? // hours played or %
+  progress Int?
   score    Float?
-  status   String? // Playing, Completed, Dropped
+  status   String?
 
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId])
+  @@index([userId])
+  @@index([gameId])
 }
 
 model MusicList {
@@ -204,8 +241,12 @@ model MusicList {
   userId  String
   musicId String
   score   Float?
-  status  String? // Listening, Completed
+  status  String?
 
   user  User  @relation(fields: [userId], references: [id])
   music Music @relation(fields: [musicId], references: [id])
+
+  @@unique([userId, musicId])
+  @@index([userId])
+  @@index([musicId])
 }

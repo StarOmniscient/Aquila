@@ -1,5 +1,9 @@
 
 
+ABAMDOMED
+
+to lazy to fix 
+
 TODO:
 Profile / Settings
 
